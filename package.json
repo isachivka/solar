@@ -1,0 +1,10 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "description": "Frontend package",
+  "private": true,
+  "dependencies": {
+    "gulp": "3.8.8",
+    "gulp-coffee": "2.2.0"
+  }
+}

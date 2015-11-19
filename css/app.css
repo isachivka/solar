@@ -1,0 +1,56 @@
+html, body {
+  height: 100%;
+}
+body {
+  background: url(../img/bg.png) no-repeat center center;
+  padding: 0;
+  margin: 0;
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
+#solar-system {height: 100%;}
+
+svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.solar__orbit_circle { 
+  fill:rgba(255, 255, 255, 0.04); 
+  stroke: rgba(255, 255, 255, 0.2); 
+  stroke-width: 1px;
+}
+.solar__orbit_text {
+  font-size: 12px;
+  text-anchor: end;
+  font-family: 'Roboto';
+  font-weight: lighter;
+  fill: rgba(255, 255, 255, 0.2);
+}
+
+.solar__item {
+  cursor: pointer;
+}
+.solar__item_circle { 
+  fill: rgba(255, 255, 255, 1);
+}
+.solar__item_text_after {
+  text-anchor: middle;
+  font-family: 'Roboto';
+  font-size: 15px;
+  font-weight: lighter;
+  fill: rgba(255, 255, 255, 0.8);
+}
+
+.opacity {
+  opacity: 0;
+}
+.color1 {
+  fill: rgba(255, 70, 70, 0.04);
+  stroke: rgba(255, 70, 70, 0.2); 
+}
+.blue {
+  fill: #1B4EA5;
+}

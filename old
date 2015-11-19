@@ -1,0 +1,298 @@
+
+
+solar = '';
+timer = 0;
+class_preffix = 'solar_'
+orbits_data = [
+  { radius: 140, class: 'color1', text: '' }
+  { radius: 250, class: 'color1', text: '' }
+  { radius: 360, class: 'color1', text: '1 year' }
+  { radius: 480, class: 'color1', text: '2' }
+  { radius: 590, class: 'color1', text: '3' }
+  { radius: 700, class: 'color1', text: '4' }
+]
+items_data = [
+  { orbit: -1,class: 'class1 class2',  degree: 0,   radius: 50 }
+  { orbit: 1, class: 'class1 class2', degree: 0,   radius: 50 }
+  { orbit: 2, class: 'class1 class2', degree: 45,  radius: 60 }
+  { orbit: 3, class: 'class1 class2', degree: 90, radius: 70 }
+  { orbit: 2, class: 'class1 class2', degree: 135, radius: 100 }
+  { orbit: 1, class: 'class1 class2', degree: 235, radius: 40 }
+  { orbit: 0, class: 'class1 class2', degree: 270, radius: 20 }
+]
+items_data_1 = [
+  { orbit: -1, degree: 0,   radius: 30 }
+  { orbit: 1, degree: 0,   radius: 30 }
+  { orbit: 1, degree: 20,   radius: 30 }
+  { orbit: 2, degree: 45,  radius: 30 }
+  { orbit: 2, degree: 65,  radius: 30 }
+  { orbit: 3, degree: 90, radius:  30 }
+  { orbit: 2, degree: 135, radius: 30 }
+  { orbit: 1, degree: 235, radius: 30 }
+  { orbit: 0, degree: 270, radius: 30 }
+]
+
+init = () ->
+  solar = d3
+    .select("#solar-system").append("svg")
+    .append('g').attr('transform','translate(640, 500)') 
+    # 50% от ширины - высоты svg
+    # нужно переписывать чтобы у холста размеры были 100%х100%
+    # после переписать здесь, обновлять по ресайзу окна
+  orbits solar, orbits_data
+  items solar, items_data, orbits_data
+  animate_from_center solar, orbits_data, items_data
+  #setTimeout(() ->
+  #  animate_to_center solar, orbits_data, items_data
+  #  setTimeout(() ->
+  #    items solar, items_data_1, orbits_data
+  #    animate_from_nowhere solar, orbits_data, items_data_1
+  #    setTimeout(() ->
+  #      animate_to_nowhere solar, orbits_data, items_data_1
+  #    , 1500)
+  #  , 1000)
+  #, 3000)
+
+animate_from_nowhere = (solar, orbits_data, items_data) ->
+
+  cx = (t, i) -> # t: 0, 0.001, 0.002, .., 1
+    if items_data[i].orbit == -1
+      x = 0
+    else
+      r = orbits_data[items_data[i].orbit].radius + 2000 * -1 * (t - 1) # 1..0
+      d = items_data[i].degree + 30 * (t - 1) # t-1: -1, -0.999, .. 0
+      # поправляем градус от - 30 до 0
+      x = ( Math.cos d * Math.PI / 180 ) * r
+    x
+
+  cy = (t, i) -> # t 0, 0.001, 0.002, .., 1
+    if items_data[i].orbit == -1
+      x = 0
+    else
+      r = orbits_data[items_data[i].orbit].radius + 2000 * -1 * (t - 1) # 1..0
+      d = items_data[i].degree + 30 * (t - 1) # t-1: -1, -0.999, .. 0
+      # поправляем градус от - 30 до 0
+      x = ( Math.sin d * Math.PI / 180 ) * r
+    x
+
+  solar.selectAll("ellipse.#{class_preffix}item").each (d, i) ->
+    if items_data[i].orbit == -1
+      d3.select(this).transition().delay(400).duration(300).attr('opacity', 1).attr('cx', 0).attr('cy', 0)
+      .attr('rx', items_data[i].radius).attr('ry', items_data[i].radius)
+      #d3.select(this).transition().delay(100).duration(150)
+    else
+      d3.select(this).transition().duration(600)
+        .attr('opacity', 1).attr('rx', items_data[i].radius).attr('ry', items_data[i].radius)
+        .tween('cy-swap', () ->
+          (t) ->
+            d3.select(this).attr('cy', cy(t, i))
+        ).tween('cx-swap', () ->
+          (t) ->
+            d3.select(this).attr('cx', cx(t, i))
+        )
+
+animate_to_nowhere = (solar, orbits_data, items_data) ->
+
+  cx = (t, i) -> # t: 0, 0.001, 0.002, .., 1
+    if items_data[i].orbit == -1
+      x = 0
+    else
+      r = orbits_data[items_data[i].orbit].radius + 2000 * t # 1..0
+      d = items_data[i].degree + 30 * t
+      # поправляем градус от - 30 до 0
+      x = ( Math.cos d * Math.PI / 180 ) * r
+    x
+
+  cy = (t, i) -> # t 0, 0.001, 0.002, .., 1
+    if items_data[i].orbit == -1
+      x = 0
+    else
+      r = orbits_data[items_data[i].orbit].radius + 2000 * t # 1..0
+      d = items_data[i].degree + 30 * t
+      # поправляем градус от - 30 до 0
+      x = ( Math.sin d * Math.PI / 180 ) * r
+    x
+
+  solar.selectAll("ellipse.#{class_preffix}item").each (d, i) ->
+    if items_data[i].orbit == -1
+      d3.select(this).transition().duration(300).attr('opacity', 0).attr('cx', 0).attr('cy', 0)
+      .attr('rx', items_data[i].radius).attr('ry', items_data[i].radius)
+      #d3.select(this).transition().delay(100).duration(150)
+    else
+      d3.select(this).transition().delay(400).duration(600)
+        .attr('opacity', 1).attr('rx', items_data[i].radius).attr('ry', items_data[i].radius)
+        .tween('cy-swap', () ->
+          (t) ->
+            d3.select(this).attr('cy', cy(t, i))
+        ).tween('cx-swap', () ->
+          (t) ->
+            d3.select(this).attr('cx', cx(t, i))
+        )
+
+animate_to_center = (solar, orbits_data, items_data) ->
+
+  cx = (t, i) -> # t: 0, 0.001, 0.002, .., 1
+    if items_data[i].orbit == -1
+      x = 0
+    else
+      r = orbits_data[items_data[i].orbit].radius * -1 * (t - 1)
+      d = items_data[i].degree - 30 * t
+      # поправляем градус от - 30 до 0
+      x = ( Math.cos d * Math.PI / 180 ) * r
+    x
+
+  cy = (t, i) -> # t 0, 0.001, 0.002, .., 1
+    if items_data[i].orbit == -1
+      x = 0
+    else
+      r = orbits_data[items_data[i].orbit].radius * -1 * (t - 1)
+      d = items_data[i].degree - 30 * t
+      # поправляем градус от - 30 до 0
+      x = ( Math.sin d * Math.PI / 180 ) * r
+    x
+
+  solar.selectAll("ellipse.#{class_preffix}item").each (d, i) ->
+    if items_data[i].orbit == -1
+      d3.select(this).transition().delay(600).duration(300).attr('opacity', 0).attr('cx', 0).attr('cy', 0)
+      .attr('rx', 0).attr('ry', 0)
+    else
+      d3.select(this).transition().duration(600)
+        .attr('opacity', 0).attr('rx', 0).attr('ry', 0)
+        .tween('cy-swap', () ->
+          (t) ->
+            d3.select(this).attr('cy', cy(t, i))
+        ).tween('cx-swap', () ->
+          (t) ->
+            d3.select(this).attr('cx', cx(t, i))
+        )
+
+  fns = []
+
+  solar.selectAll("ellipse.#{class_preffix}orbit").each (d, i) ->
+    # нужно что-то врое down_each
+    obj = this
+    fns.push () ->
+      setTimeout(() ->
+        # первому просто меняем прозрачность
+        if i == 0
+          d3.select(obj).transition().delay(200).duration(300).attr('opacity', 0)
+        # остальным изменяем радиус на радиус предыдущей орбиты
+        # потом меняем прозрачность в 1 и плавно меняем радиус до
+        # нужного
+        if i != 0
+          d3.select(obj).transition().delay(200).duration(300)
+            .attr('opacity', 0)
+            .attr('rx', orbits_data[i-1].radius).attr('ry', orbits_data[i-1].radius)
+        cb()
+      , 80)
+
+  fns = fns.reverse()
+  cb = () ->
+    fn = fns.shift()
+    if typeof fn is 'function'
+      fn.call()
+
+  cb()
+
+animate_from_center = (solar, orbits_data, items_data) ->
+
+  cx = (t, i) -> # t: 0, 0.001, 0.002, .., 1
+    if items_data[i].orbit == -1
+      x = 0
+    else
+      r = orbits_data[items_data[i].orbit].radius * t
+      d = items_data[i].degree + 30 * (t - 1) # t-1: -1, -0.999, .. 0
+      # поправляем градус от - 30 до 0
+      x = ( Math.cos d * Math.PI / 180 ) * r
+    x
+
+  cy = (t, i) -> # t 0, 0.001, 0.002, .., 1
+    if items_data[i].orbit == -1
+      x = 0
+    else
+      r = orbits_data[items_data[i].orbit].radius * t
+      d = items_data[i].degree + 30 * (t - 1) # t-1: -1, -0.999, .. 0
+      # поправляем градус от - 30 до 0
+      x = ( Math.sin d * Math.PI / 180 ) * r
+    x
+
+  solar.selectAll("ellipse.#{class_preffix}item").each (d, i) ->
+    if items_data[i].orbit == -1
+      d3.select(this).transition().duration(300).attr('opacity', 1).attr('cx', 0).attr('cy', 0)
+      .attr('rx', items_data[i].radius).attr('ry', items_data[i].radius)
+      #d3.select(this).transition().delay(100).duration(150)
+    else
+      d3.select(this).transition().delay(200).duration(600)
+        .attr('opacity', 1).attr('rx', items_data[i].radius).attr('ry', items_data[i].radius)
+        .tween('cy-swap', () ->
+          (t) ->
+            d3.select(this).attr('cy', cy(t, i))
+        ).tween('cx-swap', () ->
+          (t) ->
+            d3.select(this).attr('cx', cx(t, i))
+        )
+
+  fns = []
+
+  solar.selectAll("ellipse.#{class_preffix}orbit").each (d, i) ->
+    # круто было бы зарефакторить последовательное выполнение функций
+    # как-то попроще
+    obj = this
+    fns.push () ->
+      setTimeout(() ->
+        # первому просто меняем прозрачность
+        if i == 0
+          d3.select(obj).attr('rx', orbits_data[i].radius).attr('ry', orbits_data[i].radius)
+          d3.select(obj).transition().duration(300).attr('opacity', 1)
+        # остальным изменяем радиус на радиус предыдущей орбиты
+        # потом меняем прозрачность в 1 и плавно меняем радиус до
+        # нужного
+        if i != 0
+          d3.select(obj).attr('rx', orbits_data[i-1].radius).attr('ry', orbits_data[i-1].radius)
+          d3.select(obj).transition().duration(300)
+            .attr('opacity', 1)
+            .attr('rx', orbits_data[i].radius)
+            .attr('ry', orbits_data[i].radius)
+        cb()
+      , 80)
+
+  cb = () ->
+    fn = fns.shift()
+    if typeof fn is 'function'
+      fn.call()
+
+  cb()
+
+orbits = (solar, data) ->
+
+  # удаляем все
+  solar.selectAll("ellipse.#{class_preffix}orbit").remove()
+  # добавляем все из data
+  elems = solar.selectAll("ellipse.#{class_preffix}orbit").data data
+  # прозрачность 0, класс orbit с префиксом
+  elems.enter().append('ellipse').attr('opacity', 0).classed("#{class_preffix}orbit", true)
+    .attr('cx', 0).attr('cy', 0)
+  # ставим классы из data
+  elems.each (d, i) ->
+    if data[i].text
+      d3.select(this).append("text").text(data[i].text)
+    if data[i].class
+      d3.select(this).classed(data[i].class, true)
+  # так и не понял зачем это нужно
+  elems.exit().remove()
+
+items = (solar, data, orbits_data) ->
+
+  # удаляем все
+  solar.selectAll("ellipse.#{class_preffix}item").remove()
+  # добавляем все из data
+  elems = solar.selectAll("ellipse.#{class_preffix}item").data data
+  # прозрачность 0, класс item с префиксом
+  elems.enter().append("ellipse").attr('opacity', 0).classed("#{class_preffix}item", true)
+  # ставим классы из data
+  elems.each (d, i) ->
+    if data[i].class
+      d3.select(this).classed(data[i].class, true)
+  elems.exit().remove()
+
+init()
